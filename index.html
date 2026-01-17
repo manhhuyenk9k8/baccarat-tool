@@ -2,51 +2,78 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Baccarat % Tool</title>
+<title>HUYMANH</title>
 <style>
 body{background:#111;color:#fff;font-family:Arial;text-align:center}
-textarea{width:80%;height:80px;font-size:16px}
-button{padding:10px 20px;font-size:18px;margin-top:10px}
-.result{margin-top:20px;font-size:22px}
+input{width:300px;height:40px;font-size:20px;text-align:center}
+button{padding:10px 25px;font-size:18px;margin-top:15px}
+.result{margin-top:25px;font-size:80px;font-weight:bold}
+.coin{margin-top:15px;font-size:20px;color:#0f0}
 </style>
 </head>
 
 <body>
-<h2>Tool Baccarat %</h2>
-<p>Nhập chuỗi (B P T)</p>
 
-<textarea id="input" placeholder="B P P B B T P"></textarea><br>
-<button onclick="run()">PHÂN TÍCH</button>
+<h1>HUYMANH</h1>
+
+<div class="coin">
+Xu còn lại: <span id="coin">0</span>
+</div>
+
+<input id="input" placeholder="ABCD"><br>
+<button onclick="calc()">XEM KẾT QUẢ (-5 xu)</button>
 
 <div class="result" id="out"></div>
 
 <script>
-function run(){
-  let arr=document.getElementById("input").value
-  .toUpperCase().replace(/[^BPT]/g,"").split("");
+// ==== CẤU HÌNH ====
+const START_COIN = 100;
+const COST = 5;
+const COIN_KEY = "huymanh_coin";
 
-  if(arr.length<5){alert("Nhập ít nhất 5 tay");return;}
+// ==== KHỞI TẠO XU ====
+if(localStorage.getItem(COIN_KEY) === null){
+  localStorage.setItem(COIN_KEY, START_COIN);
+}
 
-  let s={B:0,P:0,T:0};
-  arr.forEach(x=>s[x]++);
+function updateCoin(){
+  document.getElementById("coin").innerText =
+    localStorage.getItem(COIN_KEY);
+}
+updateCoin();
 
-  let last=arr[arr.length-1],streak=1;
-  for(let i=arr.length-2;i>=0;i--){
-    if(arr[i]==last)streak++; else break;
+function calc(){
+  let coin = parseInt(localStorage.getItem(COIN_KEY));
+
+  if(coin < COST){
+    alert("Hết xu!");
+    return;
   }
-  if(streak>=3)s[last]+=3;
 
-  arr.slice(-10).forEach(x=>s[x]+=0.5);
-  s.T*=0.4;
+  let map = {A:1, B:2, C:3, D:4};
 
-  let total=s.B+s.P+s.T;
-  let B=Math.round(s.B/total*100);
-  let P=Math.round(s.P/total*100);
-  let T=100-B-P;
+  let arr = document.getElementById("input").value
+    .toUpperCase()
+    .replace(/[^ABCD]/g,"")
+    .split("");
 
-  document.getElementById("out").innerHTML=
-  `BANKER: ${B}%<br>PLAYER: ${P}%<br>TIE: ${T}%`;
+  if(arr.length === 0){
+    alert("Nhập ABCD");
+    return;
+  }
+
+  // Trừ xu
+  coin -= COST;
+  localStorage.setItem(COIN_KEY, coin);
+  updateCoin();
+
+  let sum = 0;
+  arr.forEach(x => sum += map[x]);
+
+  let result = (sum % 2 === 0) ? "P" : "B";
+  document.getElementById("out").innerText = result;
 }
 </script>
+
 </body>
 </html>
