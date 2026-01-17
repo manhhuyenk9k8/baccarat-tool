@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Baccarat % Tool</title>
+<style>
+body{background:#111;color:#fff;font-family:Arial;text-align:center}
+textarea{width:80%;height:80px;font-size:16px}
+button{padding:10px 20px;font-size:18px;margin-top:10px}
+.result{margin-top:20px;font-size:22px}
+</style>
+</head>
+
+<body>
+<h2>Tool Baccarat %</h2>
+<p>Nhập chuỗi (B P T)</p>
+
+<textarea id="input" placeholder="B P P B B T P"></textarea><br>
+<button onclick="run()">PHÂN TÍCH</button>
+
+<div class="result" id="out"></div>
+
+<script>
+function run(){
+  let arr=document.getElementById("input").value
+  .toUpperCase().replace(/[^BPT]/g,"").split("");
+
+  if(arr.length<5){alert("Nhập ít nhất 5 tay");return;}
+
+  let s={B:0,P:0,T:0};
+  arr.forEach(x=>s[x]++);
+
+  let last=arr[arr.length-1],streak=1;
+  for(let i=arr.length-2;i>=0;i--){
+    if(arr[i]==last)streak++; else break;
+  }
+  if(streak>=3)s[last]+=3;
+
+  arr.slice(-10).forEach(x=>s[x]+=0.5);
+  s.T*=0.4;
+
+  let total=s.B+s.P+s.T;
+  let B=Math.round(s.B/total*100);
+  let P=Math.round(s.P/total*100);
+  let T=100-B-P;
+
+  document.getElementById("out").innerHTML=
+  `BANKER: ${B}%<br>PLAYER: ${P}%<br>TIE: ${T}%`;
+}
+</script>
+</body>
+</html>
