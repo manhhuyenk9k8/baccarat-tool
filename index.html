@@ -1,79 +1,53 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>HUYMANH</title>
-<style>
-body{background:#111;color:#fff;font-family:Arial;text-align:center}
-input{width:300px;height:40px;font-size:20px;text-align:center}
-button{padding:10px 25px;font-size:18px;margin-top:15px}
-.result{margin-top:25px;font-size:80px;font-weight:bold}
-.coin{margin-top:15px;font-size:20px;color:#0f0}
-</style>
+  <meta charset="UTF-8" />
+  <title>HUYMANH Baccarat Tool</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#111; color:#fff; padding:20px }
+    h1 { color:#ffd700 }
+    input, button { padding:10px; font-size:16px }
+    button { cursor:pointer }
+    .box { margin-top:15px }
+    .result { font-size:40px; margin-top:20px; font-weight:bold }
+  </style>
 </head>
-
 <body>
+  <h1>HUYMANH – Baccarat Tool</h1>
 
-<h1>HUYMANH</h1>
+  <div class="box">
+    <p>Nhập cầu chính (ví dụ: PBPBBPBP)</p>
+    <input id="road" placeholder="Chỉ nhập P B T" />
+    <button onclick="predict()">Dự đoán</button>
+  </div>
 
-<div class="coin">
-Xu còn lại: <span id="coin">0</span>
-</div>
+  <div class="result" id="result"></div>
 
-<input id="input" placeholder="ABCD"><br>
-<button onclick="calc()">XEM KẾT QUẢ (-5 xu)</button>
+  <script>
+    function predict() {
+      const input = document.getElementById('road').value.toUpperCase();
+      if (!input) return;
 
-<div class="result" id="out"></div>
+      let score = 0;
+      for (let c of input) {
+        if (c === 'P') score += 2;
+        if (c === 'B') score += 1;
+        if (c === 'T') score += 0;
+      }
 
-<script>
-// ==== CẤU HÌNH ====
-const START_COIN = 100;
-const COST = 5;
-const COIN_KEY = "huymanh_coin";
+      // mô phỏng 4 cầu: chính + 3 cầu phụ
+      const bigRoad = score % 2 === 0 ? 'P' : 'B';
+      const bigEye = score % 3 === 0 ? 'P' : 'B';
+      const smallRoad = score % 4 === 0 ? 'P' : 'B';
+      const cockroach = score % 5 === 0 ? 'P' : 'B';
 
-// ==== KHỞI TẠO XU ====
-if(localStorage.getItem(COIN_KEY) === null){
-  localStorage.setItem(COIN_KEY, START_COIN);
-}
+      let pCount = [bigRoad,bigEye,smallRoad,cockroach].filter(x=>x==='P').length;
+      let bCount = 4 - pCount;
 
-function updateCoin(){
-  document.getElementById("coin").innerText =
-    localStorage.getItem(COIN_KEY);
-}
-updateCoin();
+      let final = pCount >= bCount ? 'P' : 'B';
 
-function calc(){
-  let coin = parseInt(localStorage.getItem(COIN_KEY));
-
-  if(coin < COST){
-    alert("Hết xu!");
-    return;
-  }
-
-  let map = {A:1, B:2, C:3, D:4};
-
-  let arr = document.getElementById("input").value
-    .toUpperCase()
-    .replace(/[^ABCD]/g,"")
-    .split("");
-
-  if(arr.length === 0){
-    alert("Nhập ABCD");
-    return;
-  }
-
-  // Trừ xu
-  coin -= COST;
-  localStorage.setItem(COIN_KEY, coin);
-  updateCoin();
-
-  let sum = 0;
-  arr.forEach(x => sum += map[x]);
-
-  let result = (sum % 2 === 0) ? "P" : "B";
-  document.getElementById("out").innerText = result;
-}
-</script>
-
+      document.getElementById('result').innerText = final;
+    }
+  </script>
 </body>
 </html>
