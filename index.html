@@ -2,52 +2,80 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>HUYMANH Baccarat Tool</title>
+  <title>HUYMANH AI Baccarat</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#111; color:#fff; padding:20px }
-    h1 { color:#ffd700 }
-    input, button { padding:10px; font-size:16px }
-    button { cursor:pointer }
-    .box { margin-top:15px }
-    .result { font-size:40px; margin-top:20px; font-weight:bold }
+    body{margin:0;font-family:Segoe UI,Arial;background:#0b1220;color:#fff}
+    h1{text-align:center;color:#00e5ff;margin-top:20px}
+    .container{max-width:1100px;margin:20px auto;padding:20px}
+    .input-box{text-align:center;margin-bottom:20px}
+    input{padding:10px;font-size:16px;width:260px;border-radius:8px;border:none}
+    button{padding:10px 18px;margin:6px;border-radius:50px;border:none;font-size:16px;cursor:pointer}
+    .btn-p{background:#1e88e5;color:#fff}
+    .btn-b{background:#e53935;color:#fff}
+    .btn-t{background:#43a047;color:#fff}
+    .btn-ai{background:#ffd600;color:#000;font-weight:bold}
+    .roads{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:25px}
+    .road{background:#121a2f;border-radius:16px;padding:12px;box-shadow:0 0 20px rgba(0,229,255,.15)}
+    .road h3{text-align:center;margin:6px 0 10px 0;color:#00e5ff}
+    .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+    .cell{height:22px;border-radius:4px;background:#1c2541}
+    .P{background:#1e88e5}
+    .B{background:#e53935}
+    .T{background:#43a047}
+    .result{text-align:center;margin-top:25px;font-size:42px;font-weight:bold}
+    .stats{text-align:center;margin-top:10px;font-size:18px}
   </style>
 </head>
 <body>
-  <h1>HUYMANH – Baccarat Tool</h1>
-
-  <div class="box">
-    <p>Nhập cầu chính (ví dụ: PBPBBPBP)</p>
-    <input id="road" placeholder="Chỉ nhập P B T" />
-    <button onclick="predict()">Dự đoán</button>
+<h1>HUYMANH – AI Baccarat Tool</h1>
+<div class="container">
+  <div class="input-box">
+    <p>Nhập cầu chính (P B T)</p>
+    <input id="mainRoad" placeholder="Ví dụ: PBPBBP" />
+    <br/>
+    <button class="btn-ai" onclick="analyze()">AI PHÂN TÍCH</button>
   </div>
 
-  <div class="result" id="result"></div>
+  <div class="roads">
+    <div class="road"><h3>Cầu chính</h3><div id="roadMain" class="grid"></div></div>
+    <div class="road"><h3>Big Eye</h3><div id="roadEye" class="grid"></div></div>
+    <div class="road"><h3>Small</h3><div id="roadSmall" class="grid"></div></div>
+    <div class="road"><h3>Cockroach</h3><div id="roadCock" class="grid"></div></div>
+  </div>
 
-  <script>
-    function predict() {
-      const input = document.getElementById('road').value.toUpperCase();
-      if (!input) return;
+  <div style="text-align:center;margin-top:20px">
+    <button class="btn-p" onclick="actual('P')">P</button>
+    <button class="btn-t" onclick="actual('T')">T</button>
+    <button class="btn-b" onclick="actual('B')">B</button>
+  </div>
 
-      let score = 0;
-      for (let c of input) {
-        if (c === 'P') score += 2;
-        if (c === 'B') score += 1;
-        if (c === 'T') score += 0;
-      }
+  <div class="result" id="aiResult">?</div>
+  <div class="stats" id="stats">Thắng: 0 | Thua: 0</div>
+</div>
 
-      // mô phỏng 4 cầu: chính + 3 cầu phụ
-      const bigRoad = score % 2 === 0 ? 'P' : 'B';
-      const bigEye = score % 3 === 0 ? 'P' : 'B';
-      const smallRoad = score % 4 === 0 ? 'P' : 'B';
-      const cockroach = score % 5 === 0 ? 'P' : 'B';
-
-      let pCount = [bigRoad,bigEye,smallRoad,cockroach].filter(x=>x==='P').length;
-      let bCount = 4 - pCount;
-
-      let final = pCount >= bCount ? 'P' : 'B';
-
-      document.getElementById('result').innerText = final;
-    }
-  </script>
+<script>
+let win=0,lose=0,predict=null;
+function draw(el,data){el.innerHTML='';data.forEach(c=>{let d=document.createElement('div');d.className='cell '+c;el.appendChild(d);});}
+function analyze(){
+  const s=document.getElementById('mainRoad').value.toUpperCase().replace(/[^PBT]/g,'');
+  if(!s) return;
+  const arr=[...s];
+  const eye=arr.map((_,i)=>i%2==0?'P':'B');
+  const small=arr.map((_,i)=>i%3==0?'P':'B');
+  const cock=arr.map((_,i)=>i%4==0?'P':'B');
+  draw(roadMain,arr);
+  draw(roadEye,eye);
+  draw(roadSmall,small);
+  draw(roadCock,cock);
+  let p=[arr[arr.length-1],eye[eye.length-1],small[small.length-1],cock[cock.length-1]].filter(x=>x==='P').length;
+  predict=p>=2?'P':'B';
+  document.getElementById('aiResult').innerText=predict;
+}
+function actual(r){
+  if(!predict) return;
+  if(r===predict) win++; else lose++;
+  document.getElementById('stats').innerText=`Thắng: ${win} | Thua: ${lose}`;
+}
+</script>
 </body>
 </html>
