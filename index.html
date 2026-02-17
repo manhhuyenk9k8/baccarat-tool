@@ -1,133 +1,112 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Baccarat Predictor</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .tool {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      width: 360px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      text-align: center;
-    }
-    h2 { margin-bottom: 10px; }
-    .buttons {
-      display: flex;
-      justify-content: space-around;
-      margin: 15px 0;
-    }
-    .btn {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      border: none;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .P { background: #4caf50; color: #fff; }
-    .B { background: #f44336; color: #fff; }
-    .T { background: #ff9800; color: #fff; }
-    .history {
-      min-height: 40px;
-      margin: 10px 0;
-      font-size: 14px;
-      word-wrap: break-word;
-    }
-    .result {
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    .reset {
-      margin-top: 10px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Cyber Simulation</title>
+<style>
+body {
+    background: black;
+    color: #00ff00;
+    font-family: monospace;
+    text-align: center;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+input, button {
+    background: black;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    padding: 8px;
+    margin: 5px;
+}
+
+button:hover {
+    background: #003300;
+    cursor: pointer;
+}
+
+#output {
+    margin-top: 30px;
+    white-space: pre-line;
+}
+
+.loader {
+    border: 4px solid #003300;
+    border-top: 4px solid #00ff00;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
 </head>
 <body>
-  <div class="tool">
-    <h2>Baccarat Tool</h2>
-    <div class="buttons">
-      <button class="btn P" onclick="add('P')">P</button>
-      <button class="btn B" onclick="add('B')">B</button>
-      <button class="btn T" onclick="add('T')">T</button>
-    </div>
-    <div class="history" id="history"></div>
-    <div class="result" id="result">Chưa đủ dữ liệu</div>
-    <button class="reset" onclick="resetAll()">Reset</button>
-  </div>
+
+<div class="container">
+    <h1>CYBER SYSTEM SIMULATION</h1>
+
+    <input type="text" id="ban" placeholder="Nhập Bàn">
+    <input type="number" id="van" placeholder="Nhập Số Ván">
+
+    <br>
+
+    <button onclick="chon(1)">1</button>
+    <button onclick="chon(2)">2</button>
+
+    <div class="loader" id="loader"></div>
+    <div id="output"></div>
+</div>
 
 <script>
-let data = [];
-
-function add(x) {
-  data.push(x);
-  document.getElementById('history').innerText = data.join(' ');
-  if (data.length >= 10) analyze();
+function randomCode(length) {
+    let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
 }
 
-function resetAll() {
-  data = [];
-  document.getElementById('history').innerText = '';
-  document.getElementById('result').innerText = 'Chưa đủ dữ liệu';
-}
+function chon(option) {
+    let ban = document.getElementById("ban").value;
+    let van = document.getElementById("van").value;
+    let output = document.getElementById("output");
+    let loader = document.getElementById("loader");
 
-function analyze() {
-  let seq = data.filter(x => x !== 'T'); // bỏ hòa khi phân tích chính
-  let last = seq.slice(-6).join('');
+    if (!ban || !van) {
+        output.innerHTML = "⚠ Vui lòng nhập đầy đủ Bàn và Số Ván!";
+        return;
+    }
 
-  // Cầu bệt
-  if (/^(B){6,}$/.test(last)) return show('B (theo bệt)');
-  if (/^(P){6,}$/.test(last)) return show('P (theo bệt)');
+    let ketQua = option === 1 ? "P" : "B";
 
-  // Cầu 1-1
-  if (/^(BP){3,}$/.test(last) || /^(PB){3,}$/.test(last)) {
-    return show(seq[seq.length-1] === 'B' ? 'P (xen)' : 'B (xen)');
-  }
+    output.innerHTML = "Đang xử lý dữ liệu...";
+    loader.style.display = "block";
 
-  // Cầu 2-2
-  if (/(BBPP|PPBB){2,}$/.test(last)) {
-    let tail = seq.slice(-2).join('');
-    return show(tail === 'BB' ? 'P (2-2)' : 'B (2-2)');
-  }
+    setTimeout(() => {
+        loader.style.display = "none";
 
-  // Cầu 3-3
-  if (/(BBBPPP|PPPBBB){1,}$/.test(last)) {
-    let tail = seq.slice(-3).join('');
-    return show(tail === 'BBB' ? 'P (3-3)' : 'B (3-3)');
-  }
+        let maGia = randomCode(12);
 
-  // Cầu gãy bệt
-  let prev = seq.slice(-7, -1);
-  if (prev.length === 6 && new Set(prev).size === 1 && prev[0] !== seq[seq.length-1]) {
-    return show(seq[seq.length-1] + ' (theo tay gãy)');
-  }
-
-  // Cầu lệch (đa số)
-  let b = seq.filter(x => x === 'B').length;
-  let p = seq.filter(x => x === 'P').length;
-  if (Math.abs(b - p) >= 3) {
-    return show(b > p ? 'B (theo số đông)' : 'P (theo số đông)');
-  }
-
-  show('Bỏ cầu / không rõ');
-}
-
-function show(text) {
-  document.getElementById('result').innerText = 'Tay sau: ' + text;
+        output.innerHTML =
+            ">>> ACCESSING TABLE #" + ban + "\n" +
+            ">>> ROUND: " + van + "\n" +
+            ">>> SYSTEM CODE: " + maGia + "\n\n" +
+            ">>> RESULT: " + ketQua + "\n" +
+            ">>> PROCESS COMPLETED";
+    }, 3000);
 }
 </script>
+
 </body>
 </html>
