@@ -2,212 +2,183 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX AI - BACCARAT PREDICTOR</title>
+    <title>HACK SEXY</title>
     <style>
-        :root {
-            --neon-green: #00ff41;
-            --neon-red: #ff003c;
-            --neon-blue: #00d4ff;
-            --bg-dark: #0a0a0a;
-        }
-
         body {
-            background-color: var(--bg-dark);
-            color: var(--neon-green);
-            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
+            overflow: hidden;
+            text-shadow: 0 0 5px #0f0;
         }
 
-        .header {
-            text-shadow: 0 0 10px var(--neon-green);
-            font-size: 24px;
+        .hacker-box {
+            border: 2px solid #0f0;
+            padding: 30px;
+            background: rgba(0, 20, 0, 0.9);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            text-align: center;
+            width: 400px;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.5em;
             margin-bottom: 20px;
+            letter-spacing: 5px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.3; }
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        input[type="number"] {
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 8px;
+            width: 80%;
+            outline: none;
             text-align: center;
         }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            border: 2px solid var(--neon-green);
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-            border-radius: 10px;
-        }
-
-        .prediction-box {
-            text-align: center;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px dashed var(--neon-green);
-            background: rgba(0, 255, 65, 0.05);
-        }
-
-        #prediction-result {
-            font-size: 40px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .input-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .side-box {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn-main {
-            padding: 15px;
+        select {
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 10px;
+            width: 85%;
+            font-size: 1.2em;
             cursor: pointer;
-            font-weight: bold;
+            outline: none;
+        }
+
+        button {
+            background: #0f0;
+            color: #000;
             border: none;
-            color: white;
-            border-radius: 5px;
+            padding: 10px 30px;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
             transition: 0.3s;
         }
 
-        .btn-p { background-color: #0044ff; box-shadow: 0 0 10px #0044ff; }
-        .btn-b { background-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
-
-        select {
-            background: #1a1a1a;
-            color: white;
-            border: 1px solid var(--neon-green);
-            padding: 5px;
-            font-size: 12px;
+        button:hover {
+            background: #004400;
+            color: #0f0;
+            box-shadow: 0 0 15px #0f0;
         }
 
-        .history-log {
-            margin-top: 20px;
-            font-size: 14px;
-            word-wrap: break-word;
-            color: #888;
+        #result {
+            margin-top: 25px;
+            font-size: 2em;
+            font-weight: bold;
+            min-height: 50px;
         }
 
-        .status-bar {
-            font-size: 12px;
+        #card-code {
+            font-size: 0.8em;
+            color: #00ffcc;
             margin-top: 10px;
-            color: yellow;
+            word-break: break-all;
+        }
+
+        /* Hiệu ứng Matrix nền */
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">▼ SYSTEM CORE: AI ANALYZER ▼</div>
+<canvas id="canvas"></canvas>
 
-    <div class="container">
-        <!-- Khu vực hiển thị kết quả dự đoán -->
-        <div class="prediction-box">
-            <div>DỰ ĐOÁN TIẾP THEO:</div>
-            <div id="prediction-result">CHỜ DỮ LIỆU...</div>
-            <div id="confidence-level">Độ tin cậy: 0%</div>
-        </div>
-
-        <!-- Khu vực nhập liệu -->
-        <div class="input-section">
-            <!-- Bên Player -->
-            <div class="side-box">
-                <button class="btn-main btn-p" onclick="addData('P')">PLAYER (P)</button>
-                <label>Rỗng: <select id="p_rong"><option value="Xanh">Xanh</option><option value="Đỏ">Đỏ</option></select></label>
-                <label>Đặc: <select id="p_dac"><option value="Xanh">Xanh</option><option value="Đỏ">Đỏ</option></select></label>
-                <label>Mưa: <select id="p_mua"><option value="Xanh">Xanh</option><option value="Đỏ">Đỏ</option></select></label>
-            </div>
-
-            <!-- Bên Banker -->
-            <div class="side-box">
-                <button class="btn-main btn-b" onclick="addData('B')">BANKER (B)</button>
-                <label>Rỗng: <select id="b_rong"><option value="Đỏ">Đỏ</option><option value="Xanh">Xanh</option></select></label>
-                <label>Đặc: <select id="b_dac"><option value="Đỏ">Đỏ</option><option value="Xanh">Xanh</option></select></label>
-                <label>Mưa: <select id="b_mua"><option value="Đỏ">Đỏ</option><option value="Xanh">Xanh</option></select></label>
-            </div>
-        </div>
-
-        <div class="status-bar" id="status">Trạng thái: Đang đợi nhập ít nhất 3 ván...</div>
-        
-        <div class="history-log" id="history">Lịch sử: </div>
-        <button onclick="resetData()" style="margin-top:20px; background:none; color:grey; border:1px solid grey; cursor:pointer;">Reset System</button>
+<div class="hacker-box">
+    <h1>HACK SEXY</h1>
+    
+    <div class="input-group">
+        <input type="number" placeholder="Dữ liệu 1 (Bypass...)">
+    </div>
+    <div class="input-group">
+        <input type="number" placeholder="Dữ liệu 2 (Injecting...)">
     </div>
 
-    <script>
-        let history = [];
+    <div class="input-group">
+        <select id="selection">
+            <option value="1">Lựa chọn 1</option>
+            <option value="2">Lựa chọn 2</option>
+        </select>
+    </div>
 
-        function addData(side) {
-            // Lấy dữ liệu từ các ô chọn màu dưới chân mỗi nút
-            let r, d, m;
-            if(side === 'P') {
-                r = document.getElementById('p_rong').value;
-                d = document.getElementById('p_dac').value;
-                m = document.getElementById('p_mua').value;
-            } else {
-                r = document.getElementById('b_rong').value;
-                d = document.getElementById('b_dac').value;
-                m = document.getElementById('b_mua').value;
-            }
+    <button onclick="runHack()">OK</button>
 
-            history.push({side, r, d, m});
-            updateUI();
-            runAI();
+    <div id="result"></div>
+    <div id="card-code"></div>
+</div>
+
+<script>
+    function runHack() {
+        const sel = document.getElementById('selection').value;
+        const resDiv = document.getElementById('result');
+        const codeDiv = document.getElementById('card-code');
+        
+        // Hiện kết quả P hoặc B
+        if (sel === "1") {
+            resDiv.innerHTML = "RESULT: <span style='color: #00e1ff'>P</span>";
+        } else {
+            resDiv.innerHTML = "RESULT: <span style='color: #ff0000'>B</span>";
         }
 
-        function updateUI() {
-            const histDiv = document.getElementById('history');
-            let text = history.map(h => <span style="color:${h.side === 'P' ? '#0044ff' : '#ff0000'}">${h.side}</span>).join(" - ");
-            histDiv.innerHTML = "Lịch sử: " + text;
+        // Tạo mã code lá bài giả
+        const randomCode = "0x" + Math.random().toString(16).substr(2, 8).toUpperCase() + 
+                           "_CARD_ID:[" + Math.floor(Math.random()*52) + "]" + 
+                           "_SECURE_KEY:" + Math.random().toString(36).substr(2, 5).toUpperCase();
+        
+        codeDiv.innerText = "DECRYPTING... " + randomCode;
+    }
+
+    // Hiệu ứng chạy chữ Matrix nền
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+    const characters = matrix.split("");
+    const font_size = 10;
+    const columns = canvas.width / font_size;
+    const drops = [];
+    for(let x = 0; x < columns; x++) drops[x] = 1;
+
+    function draw() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0F0";
+        ctx.font = font_size + "px arial";
+        for(let i = 0; i < drops.length; i++) {
+            const text = characters[Math.floor(Math.random() * characters.length)];
+            ctx.fillText(text, i * font_size, drops[i] * font_size);
+            if(drops[i] * font_size > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
         }
+    }
+    setInterval(draw, 33);
+</script>
 
-        function runAI() {
-            if (history.length < 3) return;
-
-            document.getElementById('status').innerText = "Trạng thái: AI Đang tính toán...";
-            
-            setTimeout(() => {
-                let last = history[history.length - 1];
-                let colors = [last.r, last.d, last.m];
-                let redCount = colors.filter(c => c === 'Đỏ').length;
-                let blueCount = colors.filter(c => c === 'Xanh').length;
-
-                let prediction = "";
-                let prob = Math.floor(Math.random() * (95 - 75 + 1)) + 75; // Tỉ lệ từ 75% - 95%
-                let color = "";
-
-                // Thuật toán dựa trên màu sắc chiếm ưu thế của cầu phụ
-                if (redCount > blueCount) {
-                    prediction = "BANKER (B)";
-                    color = "#ff0000";
-                } else if (blueCount > redCount) {
-                    prediction = "PLAYER (P)";
-                    color = "#0044ff";
-                } else {
-                    prediction = Math.random() > 0.5 ? "BANKER (B)" : "PLAYER (P)";
-                    color = prediction === "BANKER (B)" ? "#ff0000" : "#0044ff";
-                    prob = Math.floor(Math.random() * (65 - 50 + 1)) + 50;
-                }
-
-                const resDiv = document.getElementById('prediction-result');
-                resDiv.innerText = prediction;
-                resDiv.style.color = color;
-                resDiv.style.textShadow = 0 0 20px ${color};
-                
-                document.getElementById('confidence-level').innerText = Độ tin cậy: ${prob}%;
-                document.getElementById('status').innerText = "Trạng thái: Đã phân tích xong.";
-            }, 500);
-        }
-
-        function resetData() {
-            history = [];
-            document.getElementById('history').innerText = "Lịch sử: ";
-            document.getElementById('prediction-result').innerText = "CHỜ DỮ LIỆU...";
-            document.getElementById('confidence-level').innerText = "Độ tin cậy: 0%";
-        }
-    </script>
 </body>
 </html>
