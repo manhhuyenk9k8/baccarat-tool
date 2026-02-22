@@ -2,65 +2,51 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>HACK SEXY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacker Logic Compare</title>
     <style>
         body {
             background-color: #000;
             color: #0f0;
             font-family: 'Courier New', Courier, monospace;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden;
-            text-shadow: 0 0 5px #0f0;
+            text-transform: uppercase;
         }
 
-        .hacker-box {
-            border: 2px solid #0f0;
+        .container {
+            display: flex;
+            gap: 50px;
+            margin-bottom: 30px;
+        }
+
+        .box {
             padding: 30px;
-            background: rgba(0, 20, 0, 0.9);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            border: 2px solid;
+            border-radius: 10px;
             text-align: center;
-            width: 400px;
-            position: relative;
-            z-index: 10;
+            width: 300px;
+            box-shadow: 0 0 15px currentColor;
         }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            letter-spacing: 5px;
-            animation: blink 1s infinite;
-        }
+        .red { border-color: #ff0000; color: #ff0000; }
+        .blue { border-color: #0080ff; color: #0080ff; }
 
-        @keyframes blink {
-            50% { opacity: 0.3; }
-        }
+        h2 { font-size: 2.5rem; margin-bottom: 20px; }
 
-        .input-group {
-            margin: 15px 0;
-        }
-
-        input[type="number"] {
-            background: #000;
-            border: 1px solid #0f0;
-            color: #0f0;
-            padding: 8px;
+        input {
+            background: transparent;
+            border: 1px solid currentColor;
+            color: inherit;
+            font-size: 2rem;
             width: 80%;
-            outline: none;
-            text-align: center;
-        }
-
-        select {
-            background: #000;
-            border: 1px solid #0f0;
-            color: #0f0;
             padding: 10px;
-            width: 85%;
-            font-size: 1.2em;
-            cursor: pointer;
+            margin: 10px 0;
+            text-align: center;
             outline: none;
         }
 
@@ -68,117 +54,84 @@
             background: #0f0;
             color: #000;
             border: none;
-            padding: 10px 30px;
+            padding: 15px 40px;
+            font-size: 1.5rem;
             font-weight: bold;
-            font-size: 1.1em;
             cursor: pointer;
             margin-top: 20px;
-            transition: 0.3s;
+            box-shadow: 0 0 10px #0f0;
         }
 
-        button:hover {
-            background: #004400;
-            color: #0f0;
-            box-shadow: 0 0 15px #0f0;
-        }
+        button:hover { background: #0c0; }
 
         #result {
-            margin-top: 25px;
-            font-size: 2em;
+            margin-top: 30px;
+            font-size: 5rem;
             font-weight: bold;
-            min-height: 50px;
+            text-shadow: 0 0 20px currentColor;
         }
 
-        #card-code {
-            font-size: 0.8em;
-            color: #00ffcc;
-            margin-top: 10px;
-            word-break: break-all;
-        }
-
-        /* Hiệu ứng Matrix nền */
-        #canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+        .glitch { animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-<canvas id="canvas"></canvas>
+    <div class="container">
+        <!-- Bên Đỏ (P) -->
+        <div class="box red">
+            <h2>P</h2>
+            <input type="number" id="p1" placeholder="N1">
+            <input type="number" id="p2" placeholder="N2">
+        </div>
 
-<div class="hacker-box">
-    <h1>HACK SEXY</h1>
-    
-    <div class="input-group">
-        <input type="number" placeholder="Dữ liệu 1 (Bypass...)">
-    </div>
-    <div class="input-group">
-        <input type="number" placeholder="Dữ liệu 2 (Injecting...)">
-    </div>
-
-    <div class="input-group">
-        <select id="selection">
-            <option value="1">Lựa chọn 1</option>
-            <option value="2">Lựa chọn 2</option>
-        </select>
+        <!-- Bên Xanh (B) -->
+        <div class="box blue">
+            <h2>B</h2>
+            <input type="number" id="b1" placeholder="N1">
+            <input type="number" id="b2" placeholder="N2">
+        </div>
     </div>
 
-    <button onclick="runHack()">OK</button>
+    <button onclick="calculate()">EXECUTE SYSTEM</button>
 
     <div id="result"></div>
-    <div id="card-code"></div>
-</div>
 
-<script>
-    function runHack() {
-        const sel = document.getElementById('selection').value;
-        const resDiv = document.getElementById('result');
-        const codeDiv = document.getElementById('card-code');
-        
-        // Hiện kết quả P hoặc B
-        if (sel === "1") {
-            resDiv.innerHTML = "RESULT: <span style='color: #00e1ff'>P</span>";
-        } else {
-            resDiv.innerHTML = "RESULT: <span style='color: #ff0000'>B</span>";
+    <script>
+        function processScore(n1, n2) {
+            let sum = (parseInt(n1) || 0) + (parseInt(n2) || 0);
+            if (sum > 10) {
+                // Lấy hàng đơn vị cộng hàng chục
+                let newSum = (sum % 10) + Math.floor(sum / 10);
+                // Nếu vẫn 2 chữ số thì lấy hàng đơn vị
+                return newSum % 10;
+            }
+            return sum % 10;
         }
 
-        // Tạo mã code lá bài giả
-        const randomCode = "0x" + Math.random().toString(16).substr(2, 8).toUpperCase() + 
-                           "_CARD_ID:[" + Math.floor(Math.random()*52) + "]" + 
-                           "_SECURE_KEY:" + Math.random().toString(36).substr(2, 5).toUpperCase();
-        
-        codeDiv.innerText = "DECRYPTING... " + randomCode;
-    }
-
-    // Hiệu ứng chạy chữ Matrix nền
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-    const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
-    const characters = matrix.split("");
-    const font_size = 10;
-    const columns = canvas.width / font_size;
-    const drops = [];
-    for(let x = 0; x < columns; x++) drops[x] = 1;
-
-    function draw() {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#0F0";
-        ctx.font = font_size + "px arial";
-        for(let i = 0; i < drops.length; i++) {
-            const text = characters[Math.floor(Math.random() * characters.length)];
-            ctx.fillText(text, i * font_size, drops[i] * font_size);
-            if(drops[i] * font_size > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
+        function calculate() {
+            const scoreP = processScore(document.getElementById('p1').value, document.getElementById('p2').value);
+            const scoreB = processScore(document.getElementById('b1').value, document.getElementById('b2').value);
+            
+            const resultDiv = document.getElementById('result');
+            
+            if (scoreP > scoreB) {
+                resultDiv.innerText = "P WINNER";
+                resultDiv.style.color = "#ff0000";
+            } else if (scoreB > scoreP) {
+                resultDiv.innerText = "B WINNER";
+                resultDiv.style.color = "#0080ff";
+            } else {
+                resultDiv.innerText = "H";
+                resultDiv.style.color = "#0f0";
+            }
+            
+            resultDiv.classList.add('glitch');
         }
-    }
-    setInterval(draw, 33);
-</script>
-
+    </script>
 </body>
 </html>
