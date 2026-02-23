@@ -2,165 +2,103 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>AI MATRIX LOGIC V3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Number Logic Processor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com" rel="stylesheet">
     <style>
-        body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        .grid-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 2px solid #0f0;
-            padding: 20px;
-            background: rgba(0, 40, 0, 0.3);
-        }
-
-        label { font-size: 1.2rem; margin-bottom: 10px; color: #0f0; }
-
-        input {
-            background: #000;
-            border: 1px solid #0f0;
-            color: #0f0;
-            font-size: 3rem;
-            width: 120px;
-            text-align: center;
-            padding: 10px;
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
-        }
-
-        button {
-            background: #0f0;
-            color: #000;
-            border: none;
-            padding: 20px 50px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 20px #0f0;
-            transition: 0.3s;
-        }
-
-        button:hover { transform: scale(1.1); background: #0c0; }
-
-        #display-process {
-            margin-top: 20px;
-            font-size: 1rem;
-            color: #888;
-            height: 20px;
-        }
-
-        #final-result {
-            margin-top: 30px;
-            font-size: 10rem;
-            font-weight: bold;
-            text-shadow: 0 0 30px currentColor;
-        }
-
-        .scanline {
-            width: 100%; height: 2px; background: rgba(0, 255, 0, 0.1);
-            position: fixed; top: 0; animation: scan 4s linear infinite;
-        }
-        @keyframes scan { from { top: 0; } to { top: 100%; } }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); min-height: 100vh; color: white; font-family: 'Segoe UI', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; }
+        .input-style { background: rgba(0, 0, 0, 0.2); border: 1px solid #334155; border-radius: 0.5rem; padding: 0.75rem; width: 100%; color: white; outline: none; transition: 0.3s; }
+        .input-style:focus { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+        .result-card { transition: all 0.5s ease; transform: scale(0.9); opacity: 0; }
+        .result-card.show { transform: scale(1); opacity: 1; }
     </style>
 </head>
-<body>
-    <div class="scanline"></div>
-    <h1 style="text-shadow: 0 0 10px #0f0;">AI DATA ANALYZER</h1>
+<body class="flex items-center justify-center p-4">
 
-    <div class="grid-inputs">
-        <div class="input-group">
-            <label>Ô 1 (P)</label>
-            <input type="number" id="v1" placeholder="0">
+    <div class="glass p-8 w-full max-w-md shadow-2xl">
+        <h1 class="text-2xl font-bold text-center mb-6 text-sky-400"><i class="fas fa-robot mr-2"></i> AI Logic Processor</h1>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">Dãy số (4-5 chữ số)</label>
+                <input type="text" id="sequence" class="input-style" placeholder="Ví dụ: 12345" maxlength="5">
+            </div>
+
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">Mã nhận diện (VD: #1, #2...)</label>
+                <input type="text" id="code" class="input-style" placeholder="#1">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Số cộng 1</label>
+                    <input type="number" id="plus1" class="input-style" placeholder="Số 1">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Số cộng 2</label>
+                    <input type="number" id="plus2" class="input-style" placeholder="Số 2">
+                </div>
+            </div>
+
+            <button onclick="processAI()" class="w-full bg-sky-500 hover:bg-sky-400 text-white font-bold py-3 rounded-lg transition duration-300 shadow-lg mt-4">
+                PHÂN TÍCH NGAY
+            </button>
         </div>
-        <div class="input-group">
-            <label>Ô 2 (B)</label>
-            <input type="number" id="v2" placeholder="0">
-        </div>
-        <div class="input-group">
-            <label>Ô 3</label>
-            <input type="number" id="v3" placeholder="0">
-        </div>
-        <div class="input-group">
-            <label>Ô 4</label>
-            <input type="number" id="v4" placeholder="0">
+
+        <div id="resultArea" class="result-card mt-8 text-center p-6 rounded-xl bg-slate-800 border border-slate-700">
+            <p class="text-slate-400 text-sm mb-2">KẾT QUẢ SO SÁNH</p>
+            <div id="finalChar" class="text-7xl font-black mb-2">?</div>
+            <div id="detailLog" class="text-xs text-slate-500 italic mt-2"></div>
         </div>
     </div>
 
-    <button onclick="aiAnalyze()">RUN AI ANALYSIS</button>
-
-    <div id="display-process"></div>
-    <div id="final-result"></div>
-
     <script>
-        function reduceToSingleDigit(n) {
-            n = Math.abs(Math.floor(n));
+        function sumDigits(n) {
+            n = Math.abs(n);
             while (n >= 10) {
-                let sum = 0;
-                let s = n.toString();
-                for (let char of s) sum += parseInt(char);
-                n = sum;
+                n = n.toString().split('').reduce((acc, curr) => acc + parseInt(curr), 0);
             }
             return n;
         }
 
-        function aiAnalyze() {
-            // Lấy giá trị 4 ô
-            const n1 = parseInt(document.getElementById('v1').value) || 0;
-            const n2 = parseInt(document.getElementById('v2').value) || 0;
-            const n3 = parseInt(document.getElementById('v3').value) || 0;
-            const n4 = parseInt(document.getElementById('v4').value) || 0;
+        function processAI() {
+            const seq = document.getElementById('sequence').value;
+            const code = document.getElementById('code').value;
+            const p1 = parseInt(document.getElementById('plus1').value) || 0;
+            const p2 = parseInt(document.getElementById('plus2').value) || 0;
 
-            // 1. Tính tổng 4 ô
-            const total = n1 + n2 + n3 + n4;
-            
-            // 2. Tách hàng chục và hàng đơn vị của tổng
-            // Ví dụ: tổng = 25 -> chuc = 2, donVi = 5. Nếu tổng < 10 thì chuc = 0.
-            const chuc = Math.floor((total % 100) / 10);
-            const donVi = total % 10;
-
-            // 3. Cộng vào ô 1 và ô 2
-            let finalP_Raw = n1 + chuc;
-            let finalB_Raw = n2 + donVi;
-
-            // 4. Cộng dồn cho đến khi còn 1 chữ số
-            const finalP = reduceToSingleDigit(finalP_Raw);
-            const finalB = reduceToSingleDigit(finalB_Raw);
-
-            // Hiển thị kết quả
-            const resDiv = document.getElementById('final-result');
-            const processDiv = document.getElementById('display-process');
-            
-            processDiv.innerText = `Total: ${total} | P-Process: ${n1}+${chuc} | B-Process: ${n2}+${donVi}`;
-
-            if (finalP > finalB) {
-                resDiv.innerText = "P";
-                resDiv.style.color = "#ff0000";
-            } else if (finalB > finalP) {
-                resDiv.innerText = "B";
-                resDiv.style.color = "#0080ff";
-            } else {
-                resDiv.innerText = "H";
-                resDiv.style.color = "#0f0";
+            if (!seq || !code.startsWith('#')) {
+                alert("Vui lòng nhập đúng định dạng!");
+                return;
             }
+
+            // Lấy vị trí bắt đầu dựa trên mã #
+            let startIndex = parseInt(code.replace('#', '')) - 1;
+            let n1 = parseInt(seq[startIndex % seq.length]);
+            let n2 = parseInt(seq[(startIndex + 1) % seq.length]);
+
+            // Tính tổng và rút gọn về 1 chữ số
+            let total1 = sumDigits(n1 + p1);
+            let total2 = sumDigits(n2 + p2);
+
+            // So sánh
+            let result = "";
+            let color = "";
+            if (total1 > total2) { result = "P"; color = "#f87171"; }
+            else if (total1 < total2) { result = "B"; color = "#34d399"; }
+            else { result = "H"; color = "#fbbf24"; }
+
+            // Hiển thị
+            const resCard = document.getElementById('resultArea');
+            const charDiv = document.getElementById('finalChar');
+            const detailDiv = document.getElementById('detailLog');
+
+            resCard.classList.add('show');
+            charDiv.innerText = result;
+            charDiv.style.color = color;
+            detailDiv.innerText = `Logic: (${n1}+${p1}=${total1}) vs (${n2}+${p2}=${total2})`;
         }
     </script>
 </body>
