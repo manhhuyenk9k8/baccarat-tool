@@ -3,85 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Logic Reset</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Tra Cứu PBT</title>
     <style>
-        body { background: #050505; color: white; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #111; padding: 2rem; border-radius: 20px; width: 100%; max-width: 380px; border: 1px solid #333; box-shadow: 0 0 30px rgba(0,255,255,0.1); }
-        input { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 12px; outline: none; text-align: center; font-size: 1.1rem; }
-        input:focus { border-color: #00d4ff; }
-        button { width: 100%; background: linear-gradient(90deg, #00d4ff, #0055ff); color: white; font-weight: bold; padding: 14px; border-radius: 10px; cursor: pointer; border: none; text-transform: uppercase; letter-spacing: 1px; }
-        #result { margin-top: 25px; text-align: center; }
-        .display-char { font-size: 6rem; font-weight: 800; text-shadow: 0 0 20px currentColor; transition: 0.3s; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #e9ecef; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        .input-group { display: flex; gap: 15px; margin-bottom: 25px; justify-content: center; }
+        input { width: 80px; height: 50px; text-align: center; font-size: 1.5rem; text-transform: uppercase; border: 2px solid #ddd; border-radius: 10px; outline: none; transition: border-color 0.3s; }
+        input:focus { border-color: #007bff; }
+        
+        .display-group { display: flex; gap: 20px; margin-top: 30px; justify-content: center; }
+        .box { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 12px; color: white; font-size: 1.8rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .p-box { background-color: #28a745; } /* Xanh */
+        .b-box { background-color: #dc3545; } /* Đỏ */
+        .t-box { background-color: #ffffff; color: #333; border: 1px solid #ccc; } /* Trắng */
+
+        #resultArea { margin-top: 25px; font-size: 2rem; font-weight: bold; min-height: 50px; }
+        
+        .new-entry { margin-top: 20px; padding: 20px; background: #fff3cd; border-radius: 10px; border: 1px solid #ffeeba; }
+        .btn-save { padding: 10px 25px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 1rem; margin-top: 10px; }
+        .btn-save:hover { background: #218838; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2 style="text-align: center; margin-bottom: 20px; color: #00d4ff; font-weight: 300;">AI ANALYZER</h2>
-        
-        <input type="text" id="seq" placeholder="Dãy số (VD: 1234)" maxlength="5">
-        <input type="text" id="code" placeholder="Mã số (VD: #1)">
-        
-        <div style="display: flex; gap: 10px;">
-            <input type="number" id="v1" placeholder="Số 1">
-            <input type="number" id="v2" placeholder="Số 2">
+    <div class="container">
+        <h2>HỆ THỐNG TRA CỨU</h2>
+
+        <div class="input-group">
+            <input type="text" id="input1" maxlength="3" placeholder="..." oninput="checkData()">
+            <input type="text" id="input2" maxlength="3" placeholder="..." oninput="checkData()">
         </div>
 
-        <button onclick="runLogic()">Phân tích kết quả</button>
+        <div id="resultArea"></div>
 
-        <div id="result">
-            <div id="char" class="display-char">-</div>
-            <div id="debug" style="font-size: 0.75rem; color: #555; margin-top: 10px; font-family: monospace;"></div>
+        <div id="newEntryForm" class="new-entry hidden">
+            <p style="margin:0 0 10px 0;">Chuỗi mới! Nhập kết quả (P/B/T/H):</p>
+            <input type="text" id="newResult" maxlength="1" style="width: 50px; height: 40px; margin-bottom: 10px;">
+            <br>
+            <button class="btn-save" onclick="saveNewData()">XÁC NHẬN LƯU</button>
+        </div>
+
+        <div class="display-group">
+            <div class="box p-box">P</div>
+            <div class="box b-box">B</div>
+            <div class="box t-box">T</div>
         </div>
     </div>
 
     <script>
-        function sumToOneDigit(n) {
-            n = Math.abs(n);
-            if (n === 0) return 0;
-            let res = n % 9;
-            return res === 0 ? 9 : res;
+        // Dữ liệu mặc định bạn đã gửi
+        let dataStore = {
+            "PPB BPP": "H", "BBB BPB": "P",
+            "PBT BTP": "B", "BBP BPP": "P",
+            "BTB PBB": "P", "BPP TPB": "P",
+            "TBP BBP": "P", "PPP BBB": "P",
+            "BPP TPP": "P", "PPP PPP": "H",
+            "PPP PBB": "B", "BPP BPB": "B",
+            "PPB PPT": "B", "PPP BPP": "P",
+            "PBB TPB": "P", "BBP BBP": "B",
+            "BPB BPP": "P", "PBP PPP": "P",
+            "BPP BBB": "P", "PPP PTB": "P",
+            "PPP PBP": "P", "PBT PTP": "P",
+            "BTP BTP": "P"
+        };
+
+        function checkData() {
+            const in1 = document.getElementById('input1').value.toUpperCase();
+            const in2 = document.getElementById('input2').value.toUpperCase();
+            const resultArea = document.getElementById('resultArea');
+            const form = document.getElementById('newEntryForm');
+
+            if (in1.length === 3 && in2.length === 3) {
+                const query = `${in1} ${in2}`;
+                
+                if (dataStore[query]) {
+                    const res = dataStore[query];
+                    resultArea.innerText = res;
+                    // Đổi màu chữ kết quả
+                    if(res === 'P') resultArea.style.color = "#28a745";
+                    else if(res === 'B') resultArea.style.color = "#dc3545";
+                    else if(res === 'H') resultArea.style.color = "#6c757d";
+                    else resultArea.style.color = "#333";
+                    
+                    form.classList.add('hidden');
+                } else {
+                    resultArea.innerText = "???";
+                    resultArea.style.color = "#ff8c00";
+                    form.classList.remove('hidden');
+                }
+            } else {
+                resultArea.innerText = "";
+                form.classList.add('hidden');
+            }
         }
 
-        function runLogic() {
-            const sequence = document.getElementById('seq').value;
-            const codeInput = document.getElementById('code').value;
-            const add1 = parseInt(document.getElementById('v1').value) || 0;
-            const add2 = parseInt(document.getElementById('v2').value) || 0;
-
-            if (sequence.length < 4 || !codeInput.startsWith('#')) {
-                alert("Vui lòng nhập đúng dãy số (4-5 số) và mã #");
-                return;
-            }
-
-            let n = sequence.length;
-            let index = parseInt(codeInput.replace('#', ''));
-
-            // LOGIC RESET: 
-            // Nếu là #1 -> lấy index 0, 1
-            // Nếu là #2 -> lấy index 1, 2
-            // Nếu là #3 -> lấy index 2, 3
-            // Nếu là #4 (của dãy 4) -> Quay về lấy index 0, 1
-            let pos1 = (index - 1) % (n - 1);
-            let pos2 = pos1 + 1;
-
-            let numA = parseInt(sequence[pos1]);
-            let numB = parseInt(sequence[pos2]);
-
-            let final1 = sumToOneDigit(numA + add1);
-            let final2 = sumToOneDigit(numB + add2);
-
-            let resChar = "H", resColor = "#ffcc00";
-            if (final1 > final2) { resChar = "P"; resColor = "#ff4d4d"; }
-            else if (final1 < final2) { resChar = "B"; resColor = "#00ff88"; }
-
-            const charDiv = document.getElementById('char');
-            charDiv.innerText = resChar;
-            charDiv.style.color = resColor;
+        function saveNewData() {
+            const in1 = document.getElementById('input1').value.toUpperCase();
+            const in2 = document.getElementById('input2').value.toUpperCase();
+            const newRes = document.getElementById('newResult').value.toUpperCase();
             
-            document.getElementById('debug').innerText = 
-                `Mã ${codeInput} lấy cặp: (${numA}, ${numB}) | Tổng: ${final1} vs ${final2}`;
+            if (newRes) {
+                const query = `${in1} ${in2}`;
+                dataStore[query] = newRes;
+                alert("Đã lưu: " + query + " = " + newRes);
+                document.getElementById('newResult').value = "";
+                checkData();
+            }
         }
     </script>
 </body>
